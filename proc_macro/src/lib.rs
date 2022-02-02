@@ -2,7 +2,7 @@ use proc_macro::{self, TokenStream};
 use quote::ToTokens;
 use syn::{
     parse::Parse, parse_macro_input, parse_quote, Arm, Expr,
-    ExprMatch, ExprPath, LitStr, Token,
+    ExprMatch, LitStr, Token,
 };
 
 struct ArrayMatch {

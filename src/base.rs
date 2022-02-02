@@ -1,6 +1,8 @@
 use super::DecodeError;
 
 /// base x where each letter Alphabet only contains 1 unicode byte
+/// 
+/// Base is object safe but I wouldn't recommend using it as such
 pub trait Base<const BASE: usize> {
     const ALPHABET: [char; BASE];
 
@@ -20,12 +22,18 @@ pub trait Base<const BASE: usize> {
         input: impl Into<&'a [u8; S]>,
     ) -> Result<[u8; gen_decoded_size(Self::ALPHABET, S)], DecodeError>;
 
-    /// C++ algorithim uses a [i8; 256] LUT 
+    /// C++ algorithim uses a \[i8; 256] LUT
+    /// 
     /// since we want to use any UTF-8, we instead generate a match statement for each char
     /// the result should be smaller and might actually be faster than using a LUT while allow use of UTF-8 as well
-    /// NOTE: associated const and alphabet used in the macro should be the exact same
     /// 
+    /// ### NOTE: associated const and alphabet used in the macro should be the exact same
+    /// 
+    /// e.g.
     /// ```rust
+    /// const ALPHABET: [char; 58] =
+    ///     const_str::to_char_array!("123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz");
+    /// 
     /// fn lookup_char(ch: char) -> Option<usize> {
     ///     gen_char_match!(
     ///         ch,
@@ -72,7 +80,7 @@ impl<T: AsciiBase<BASE>, const BASE: usize> Base<BASE> for T {
 }
 
 #[derive(Debug)]
-struct Base58 {}
+pub struct Base58 {}
 
 impl Base<58> for Base58 {
     const ALPHABET: [char; 58] =
@@ -92,7 +100,8 @@ impl Base<58> for Base58 {
         [(); gen_encoded_size(Self::ALPHABET, S)]:,
     {
         let arr = &[0u8; gen_encoded_size(Self::ALPHABET, S)];
-        let s: &str = core::str::from_utf8(arr).unwrap();
+        // SAFETY: uhh this isnt safe xd
+        let s: &str = unsafe { core::str::from_utf8_unchecked(arr) };
         todo!()
     }
 
