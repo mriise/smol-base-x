@@ -1,19 +1,22 @@
 
-// #![cfg_attr(not(feature = "std"), no_std)]
-#![feature(generic_const_exprs)]
+#![cfg_attr(feature = "unstable", feature(generic_const_exprs))]
 #![feature(const_fn_floating_point_arithmetic)]
+
 pub mod base;
 pub use proc_macro::gen_char_match;
 
+#[derive(Debug)]
 pub enum DecodeError {
     InvalidLength(usize),
     InvalidChar,
+    CharAfterTrailingSpaces
 }
-
 
 
 #[cfg(test)]
 mod tests {
+    use crate::base::Base;
+
 
     #[test]
     fn test_proc_macro() {
@@ -40,5 +43,16 @@ mod tests {
             assert_eq!(proc(ch).unwrap(), normal(ch).unwrap());
         }
         
+    }
+
+    #[test]
+    fn aa() {
+        use crate::base::Base58;
+
+        let a = Base58::default();
+
+        let c = a.encode_arr(&[0u8; 4]).unwrap();
+
+
     }
 }
