@@ -5,18 +5,18 @@ use syn::{
     ExprMatch, LitStr, Token,
 };
 
-struct ArrayMatch {
+struct CharMatch {
     expr: Box<Expr>,
     alphabet: LitStr,
 }
 
-impl Parse for ArrayMatch {
+impl Parse for CharMatch {
     fn parse(input: syn::parse::ParseStream) -> syn::Result<Self> {
         let expr: Box<Expr> = input.parse()?;
         input.parse::<Token![,]>()?;
         let alphabet: LitStr = input.parse()?;
 
-        Ok(ArrayMatch {
+        Ok(CharMatch {
             expr,
             alphabet,
         })
@@ -25,10 +25,10 @@ impl Parse for ArrayMatch {
 
 #[proc_macro]
 pub fn gen_char_match(input: TokenStream) -> TokenStream {
-    let ArrayMatch {
+    let CharMatch {
         expr,
         alphabet,
-    } = parse_macro_input!(input as ArrayMatch);
+    } = parse_macro_input!(input as CharMatch);
 
     let cases = alphabet.value();
 
@@ -39,7 +39,7 @@ pub fn gen_char_match(input: TokenStream) -> TokenStream {
 
     arms.push(parse_quote!(_ => None,));
 
-    let match_exp: ExprMatch = ExprMatch {
+    let match_exp = ExprMatch {
         attrs: Default::default(),
         match_token: Default::default(),
         brace_token: Default::default(),

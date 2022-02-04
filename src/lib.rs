@@ -4,6 +4,7 @@
 #![feature(const_fn_floating_point_arithmetic)]
 pub mod base;
 pub use proc_macro::gen_char_match;
+pub(crate) mod util;
 
 pub enum DecodeError {
     InvalidLength(usize),
@@ -39,6 +40,13 @@ mod tests {
         for ch in ['a', 'b', 'c'] {
             assert_eq!(proc(ch).unwrap(), normal(ch).unwrap());
         }
+        
+    }
+
+    #[test]
+    fn base() {
+        use crate::base::*;
+
         
     }
 }
