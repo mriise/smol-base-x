@@ -9,6 +9,9 @@ edition = "2021"
 const-str = "0.3.1"
 proc-macro = { version = "*", path = "proc_macro" }
 
+[dev-dependencies]
+hex = "0.4.3"
+
 [features]
 unstable = []
 

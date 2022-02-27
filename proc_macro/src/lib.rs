@@ -39,7 +39,7 @@ pub fn gen_char_match(input: TokenStream) -> TokenStream {
 
     arms.push(parse_quote!(_ => None,));
 
-    let match_exp = ExprMatch {
+let match_exp = ExprMatch {
         attrs: Default::default(),
         match_token: Default::default(),
         brace_token: Default::default(),

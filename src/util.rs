@@ -1,12 +1,18 @@
-pub const fn gen_encoded_size<const S: usize>(_base: [char; S], input_byte_size: usize) -> usize {
-    (input_byte_size as f64 * (log10(S) / log10(256)) + 1.0) as usize
+/// generates the final encoded ceiling for a given base to be used as the allocated array size
+/// given as `(input_byte_size * (log10(base) / log10(256)) + 1.0`
+pub const fn encoded_arr_size(base: usize, input_byte_size: usize) -> usize {
+    (input_byte_size as f64 * (log10(base) / log10(256)) + 1.0) as usize
 }
 
-pub const fn gen_decoded_size<const S: usize>(_base: [char; S], input_byte_size: usize) -> usize {
-    (input_byte_size as f64 * (log10(256) / log10(S))) as usize
+/// generates the final decoded ceiling for a given base to be used as the allocated array size
+/// given as `input_byte_size * (log10(256) / log10(base))`
+pub const fn decoded_arr_size(base: usize, input_byte_size: usize) -> usize {
+    (input_byte_size as f64 * (log10(256) / log10(base))) as usize
 }
 
-pub const fn ascii_to_char_arr<const S: usize>(ascii: [u8; S]) -> [char; S] {
+/// takes an array of ascii chars and fills a char array of the same length
+/// shouldnt be necessary for users as AsciiBase<BASE> has a blanket impl for Base<BASE>
+pub(crate) const fn ascii_to_char_arr<const S: usize>(ascii: [u8; S]) -> [char; S] {
     let mut arr = [' '; S];
     let mut ch = 0;
     while ch < S {
@@ -15,6 +21,22 @@ pub const fn ascii_to_char_arr<const S: usize>(ascii: [u8; S]) -> [char; S] {
     }
 
     arr
+}
+
+pub(crate) const fn max_utf8_char_len<const S: usize>(chars: [char; S]) -> u8 {
+    let mut max: u8 = 0;
+    let mut ch = 0;
+    while ch < S {
+        if chars[ch].len_utf8() as u8 > max {
+            max = chars[ch].len_utf8() as u8;
+        }
+        ch += 1;
+    }
+    max
+}
+
+const fn log10(x: usize) -> f64 {
+    return ln(x) / core::f64::consts::LN_10;
 }
 
 // https://stackoverflow.com/questions/35968963/trying-to-calculate-logarithm-base-10-without-math-h-really-close-just-having
@@ -34,7 +56,4 @@ const fn ln(x: usize) -> f64 {
         sum += frac / denom;
     }
     return 2.0 * sum;
-}
-const fn log10(x: usize) -> f64 {
-    return ln(x) / core::f64::consts::LN_10;
 }
