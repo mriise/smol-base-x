@@ -1,9 +1,11 @@
-
-#![cfg_attr(feature = "unstable", feature(generic_const_exprs))]
-#![feature(const_fn_floating_point_arithmetic)]
+#![cfg_attr(feature = "unstable", feature(generic_const_exprs, const_fn_floating_point_arithmetic))]
 // #![no_std]
 
-pub mod base;
+#![doc = include_str!("../README.md")]
+
+mod base;
+
+mod utf_base;
 mod base_impl;
 
 /// encode/decode_arr need to use log in order to estimate the size, which is why unstable floating point arithmetic is needed
@@ -13,13 +15,16 @@ mod base_impl;
 pub mod util;
 
 
-pub use proc_macro::gen_char_match;
+pub use proc_macro::{gen_char_match, gen_ascii_match};
 
 pub use base_impl::Base58btc;
+pub use base::Base;
+pub use utf_base::UtfBase;
 
 #[derive(Debug)]
 pub enum DecodeError {
     InvalidLength(usize),
+    /// char not in alphabet
     InvalidChar,
     CharAfterTrailingSpaces
 }
@@ -68,16 +73,29 @@ mod tests {
     #[test]
     fn full_cycle() {
         
+        let input = b"44Y6qTgSvRMkdqpQ5ufkN";
         let mut output = [0u8; 128];
 
-        let written = Base58btc::decode_mut("44Y6qTgSvRMkdqpQ5ufkN", &mut output).unwrap();
-
+        let written = Base58btc::decode_mut(input, &mut output).unwrap();
         let expected = hex::decode("6d691bdd736346aa5a0a95b373b2ab").unwrap();
-        
-        
+            
         println!("{:x?}\n{:x?}", &output[..written], &expected.as_slice());
-
         assert!(&output[..written] == expected.as_slice());
+
+
+        let expected = input;
+
+        let mut input = [0u8; 128];
+        input.copy_from_slice(&output);
+        output.fill(0);
+
+        let written = Base58btc::encode_mut(&input[..written], &mut output).unwrap();
+
+        
+        
+        println!("{:x?}\n{:x?}", &output[..written], expected);
+        assert!(&output[..written] == expected);
+        
     }
     
 
@@ -85,7 +103,7 @@ mod tests {
     fn abc_decode() {
         let mut output = [0u8; 32];
 
-        let written = Base58btc::decode_mut("ZiCa", &mut output).unwrap();
+        let written = Base58btc::decode_mut(b"ZiCa", &mut output).unwrap();
 
         let expected = b"abc";
 
