@@ -15,4 +15,4 @@ hex = "0.4.3"
 [features]
 unstable = []
 
-default = []
+default = ["unstable"]

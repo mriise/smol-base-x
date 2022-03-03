@@ -14,16 +14,16 @@ pub trait Base<const BASE: usize> {
     /// use smol_base_x::*;
     /// 
     /// let mut buf = [0u8; 16];
-    /// let bytes_written = Base58btc::decode_mut(b"ZiCa", &mut buf).unwrap();
+    /// let bytes_written = Base58btc::decode_mut("ZiCa", &mut buf).unwrap();
     ///
     /// let expected = b"abc";
     /// assert_eq!(&buf[..bytes_written], expected.as_slice());
     /// ```
-    fn decode_mut<'a>(
-        input: &[u8],
+    fn decode_mut<I: AsRef<[u8]>>(
+        input: I,
         buf: &mut [u8],
     ) -> Result<usize, DecodeError> {
-
+        let input = input.as_ref();
         if !input.is_ascii() {
             return  Err(DecodeError::InvalidChar);
         }
@@ -100,7 +100,7 @@ pub trait Base<const BASE: usize> {
     /// use smol_base_x::*;
     /// 
     /// let mut buf = [0u8; 16];
-    /// let bytes_written = Base58btc::encode_mut(b"abc", &mut buf).unwrap();
+    /// let bytes_written = Base58btc::encode_mut("abc", &mut buf).unwrap();
     ///
     /// // Here
     /// let output = core::str::from_utf8(&buf[..bytes_written]).unwrap();
@@ -108,7 +108,8 @@ pub trait Base<const BASE: usize> {
     /// let expected = "ZiCa";
     /// assert_eq!(output, expected);
     /// ```
-    fn encode_mut(input: &[u8], buf: &mut [u8]) -> Result<usize, DecodeError> {
+    fn encode_mut<I: AsRef<[u8]>>(input: I, buf: &mut [u8]) -> Result<usize, DecodeError> {
+        let input = input.as_ref();
 
         let mut zeroes = 0;
         let mut length = 0;
@@ -192,9 +193,11 @@ pub trait Base<const BASE: usize> {
     /// this is done in order to ensure decoded size is not over-bloated at compile time
     /// 
     /// output is `(decoded bytes, bytes written)`
-    fn decode_arr<const CHARS: usize>(
-        input: &[char; CHARS],
+    fn decode_arr<const CHARS: usize, I: AsRef<[u8; CHARS]>>(
+        input: I,
     ) -> Result<([u8; decoded_arr_size(Self::BASE, CHARS)], usize), DecodeError> {
+        let input = input.as_ref();
+
         let mut arr = [0u8; decoded_arr_size(Self::BASE, CHARS)];
 
         todo!();
@@ -203,9 +206,11 @@ pub trait Base<const BASE: usize> {
 
     #[cfg(feature = "unstable")]
     /// output is `(encoded chars, chars written)`
-    fn encode_arr<const BYTES: usize>(
-        input: &[u8; BYTES],
+    fn encode_arr<const BYTES: usize, I: AsRef<[u8; BYTES]>>(
+        input: I,
     ) -> Result<[char; encoded_arr_size(Self::BASE, BYTES)], DecodeError> {
+        let input = input.as_ref();
+
         let mut arr = [0u8; encoded_arr_size(Self::BASE, BYTES)];
 
         todo!()        

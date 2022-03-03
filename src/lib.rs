@@ -37,23 +37,18 @@ mod tests {
     // TODO: make tests for multi byte chars
 
     #[test]
-    fn test_proc_macro() {
-        
-        #[derive(Debug)]
-        enum E {
-            Error
-        }
+    fn char_proc_macro() {
 
         fn proc(ch: char) -> Option<usize>{
             proc_macro::gen_char_match!(ch, "abc")
         }
 
-        fn normal(ch: char) -> Result<usize, E>{
+        fn normal(ch: char) -> Option<usize>{
             match ch {
-                'a' => Ok(0),
-                'b' => Ok(1),
-                'c' => Ok(2),
-                _ => Err(E::Error),
+                'a' => Some(0),
+                'b' => Some(1),
+                'c' => Some(2),
+                _ => None,
             }
         }
         
@@ -64,16 +59,31 @@ mod tests {
     }
 
     #[test]
-    fn aa() {
+    fn ascii_proc_macro() {
 
-        // let c = Base58btc::encode_arr(&[0u8; 4]).unwrap();
+        fn proc(ch: u8) -> Option<usize>{
+            proc_macro::gen_ascii_match!(ch, b"abc")
+        }
+
+        fn normal(ch: u8) -> Option<usize>{
+            match ch {
+                97 => Some(0), // a
+                98 => Some(1), // b
+                99 => Some(2), // c
+                _ => None,
+            }
+        }
+        
+        for ch in ['a', 'b', 'c'] {
+            assert_eq!(proc(ch as u8).unwrap(), normal(ch as u8).unwrap());
+        }
 
     }
 
     #[test]
     fn full_cycle() {
         
-        let input = b"44Y6qTgSvRMkdqpQ5ufkN";
+        let input = "44Y6qTgSvRMkdqpQ5ufkN";
         let mut output = [0u8; 128];
 
         let written = Base58btc::decode_mut(input, &mut output).unwrap();
@@ -90,11 +100,9 @@ mod tests {
         output.fill(0);
 
         let written = Base58btc::encode_mut(&input[..written], &mut output).unwrap();
-
         
-        
-        println!("{:x?}\n{:x?}", &output[..written], expected);
-        assert!(&output[..written] == expected);
+        println!("{:x?}\n{:x?}", &output[..written], expected.as_bytes());
+        assert!(&output[..written] == expected.as_bytes());
         
     }
     
@@ -103,27 +111,26 @@ mod tests {
     fn abc_decode() {
         let mut output = [0u8; 32];
 
-        let written = Base58btc::decode_mut(b"ZiCa", &mut output).unwrap();
+        let written = Base58btc::decode_mut("ZiCa", &mut output).unwrap();
 
         let expected = b"abc";
 
         println!("{:x?}\n{:x?}", &output[..written], &expected.as_slice());
 
-        assert!(&output[..written] == expected.as_slice());
+        assert!(&output[..written] == expected.as_ref());
     }
 
     #[test]
     fn abc_encode() {
         let mut output = [0u8; 32]; // 3 spaces takes the same space as 'abc'
 
-        let written = Base58btc::encode_mut(b"abc", &mut output).unwrap();
+        let written = Base58btc::encode_mut("abc", &mut output).unwrap();
 
         let expected = "ZiCa";
 
         let output = core::str::from_utf8(&output[..written]).unwrap();
 
         println!("{:x?}\n{:x?}", output, expected);
-
 
         assert!(output == expected);
     }
