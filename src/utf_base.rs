@@ -16,7 +16,7 @@ pub trait UtfBase<const BASE: usize> {
     const MAX_CHAR_LEN: u8 = max_utf8_char_len(Self::ALPHABET);
 
     // returns bytes written to buffer
-    fn utf_decode_mut<'a>(
+    fn utf_decode_mut(
         input: &str,
         buf: &mut [u8],
     ) -> Result<usize, DecodeError> {

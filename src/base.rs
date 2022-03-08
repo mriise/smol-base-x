@@ -30,14 +30,14 @@ pub trait Base<const BASE: usize> {
         
         let mut iter = input.iter().peekable();
         // Skip leading spaces.
-        while iter.peek() == Some(&&(' ' as u8)) {
+        while iter.peek() == Some(&&(b' ')) {
             iter.next();
         }
 
         // Skip and count leading '1's.
         let mut zeroes = 0;
 
-        while iter.peek() == Some(&&('1' as u8)) {
+        while iter.peek() == Some(&&(b'1')) {
             iter.next();
             zeroes += 1;
             if zeroes > buf.len() {
@@ -52,7 +52,7 @@ pub trait Base<const BASE: usize> {
         let mut length = 0;
 
         // Process the characters.
-        while iter.peek() != Some(&&(' ' as u8)) {
+        while iter.peek() != Some(&&(b' ')) {
             let ch = match iter.next() {
                 Some(ch) => ch,
                 None => break, // end of input
@@ -83,7 +83,7 @@ pub trait Base<const BASE: usize> {
             assert!(carry == 0);
         }
         // Skip trailing spaces.
-        while iter.next() == Some(&(' ' as u8)) {} // this might ignore a single char after the last space
+        while iter.next() == Some(&(b' ')) {} // this might ignore a single char after the last space
 
         if iter.next().is_some() {
             return Err(DecodeError::CharAfterTrailingSpaces);
@@ -157,8 +157,8 @@ pub trait Base<const BASE: usize> {
         buf.rotate_left(buf.len() - length);
         
         // translate index into alphabet letter
-        for i in 0..length {
-            buf[i] = Self::ALPHABET[buf[i] as usize]
+        for i in buf.iter_mut().take(length) {
+            *i = Self::ALPHABET[*i as usize]
         }
 
         Ok(length)
