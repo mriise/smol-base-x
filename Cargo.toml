@@ -11,6 +11,12 @@ proc-macro = { version = "*", path = "proc_macro" }
 
 [dev-dependencies]
 hex = "0.4.3"
+criterion = "0.3"
+rand = "0.8.5"
+
+[[bench]]
+name = "lut_vs_match"
+harness = false
 
 [features]
 unstable = []
