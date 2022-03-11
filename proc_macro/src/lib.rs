@@ -1,5 +1,3 @@
-use std::io::Read;
-
 use proc_macro::{self, TokenStream};
 use quote::ToTokens;
 use syn::{

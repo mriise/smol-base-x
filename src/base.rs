@@ -2,13 +2,15 @@ use super::DecodeError;
 use crate::util::*;
 
 /// ## Base-x for Ascii alphabets (which is most)
-
 pub trait Base<const BASE: usize> {
     const ALPHABET: [u8; BASE];
+
+    const LUT: [i8; 256] = gen_lut(&Self::ALPHABET);
 
     const BASE: usize = Self::ALPHABET.len();
 
     /// decode input base encoding into buffer
+    /// it is assumed buf might be non-zeroed and will be filled with zero at the start
     ///
     /// ```rust
     /// use smol_base_x::*;
@@ -21,10 +23,11 @@ pub trait Base<const BASE: usize> {
     /// ```
     fn decode_mut<I: AsRef<[u8]>>(input: I, buf: &mut [u8]) -> Result<usize, DecodeError> {
         let input = input.as_ref();
+        buf.fill(0);
+
         if !input.is_ascii() {
             return Err(DecodeError::InvalidChar);
         }
-
         // thanks to https://sts10.github.io/2020/10/06/peeking-the-pivot.html for the great notes on iterators with look ahead
         let mut iter = input.iter().peekable();
 
@@ -108,6 +111,7 @@ pub trait Base<const BASE: usize> {
 
     /// output buff is intentionally a slice since `&mut str` is essentially useless
     /// users will have to convert output bytes into a str
+    /// it is assumed buf might be non-zeroed and will be filled with zero at the start
     ///
     /// ```rust
     /// use smol_base_x::*;
@@ -123,7 +127,7 @@ pub trait Base<const BASE: usize> {
     /// ```
     fn encode_mut<I: AsRef<[u8]>>(input: I, buf: &mut [u8]) -> Result<usize, DecodeError> {
         let input = input.as_ref();
-
+        buf.fill(0);
         // thanks to https://sts10.github.io/2020/10/06/peeking-the-pivot.html for the great notes on iterators with look ahead
         let mut iter = input.iter().peekable();
 
@@ -182,28 +186,14 @@ pub trait Base<const BASE: usize> {
         Ok(length)
     }
 
-    /// While the C++ algorithim uses a \[i8; 256] LUT, using a match statement should be smaller
-    /// and might actually be faster (TODO check this) than using a LUT while allowing use of UTF-8 as well.
-    ///  
-    /// **NOTE:** associated const char array and alphabet used in the macro should be the exact same
-    /// e.g.
-    /// ```rust
-    /// use smol_base_x::gen_ascii_match;
-    ///
-    /// const ALPHABET: [char; 58] =
-    ///     const_str::to_char_array!("123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz");
-    ///
-    /// fn lookup_ascii(ch: u8) -> Option<usize> {
-    ///     gen_ascii_match!(
-    ///         ch,
-    ///         b"123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz" // base58
-    ///     )
-    /// }
-    /// ```
-    fn lookup_ascii(ch: u8) -> Option<usize>;
+    /// Lookup the value for the current char index
+    fn lookup_ascii(ch: u8) -> Option<usize> {
+        match Self::LUT[ch as usize] {
+            -1 => None,
+            i => Some(i as usize),
+        }
+    }
 
-    #[cfg(feature = "unstable")]
-    ///
     /// This makes more assumptions about the quality of the input char array and will not do some things that would otherwise be done with the normal base-x
     /// * no spaces before or after
     /// * no leading ones to skip ?
@@ -211,6 +201,7 @@ pub trait Base<const BASE: usize> {
     /// this is done in order to ensure decoded size is not over-bloated at compile time
     ///
     /// output is `(decoded bytes, bytes written)`
+    #[cfg(feature = "unstable")]
     fn decode_arr<const CHARS: usize, I: AsRef<[u8; CHARS]>>(
         input: I,
     ) -> Result<([u8; decoded_arr_size(BASE, CHARS)], usize), DecodeError> {
@@ -222,8 +213,8 @@ pub trait Base<const BASE: usize> {
         // Ok(arr)
     }
 
-    #[cfg(feature = "unstable")]
     /// output is `(encoded chars, chars written)`
+    #[cfg(feature = "unstable")]
     fn encode_arr<const BYTES: usize, I: AsRef<[u8; BYTES]>>(
         input: I,
     ) -> Result<[char; encoded_arr_size(Self::BASE, BYTES)], DecodeError> {

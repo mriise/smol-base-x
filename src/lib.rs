@@ -2,8 +2,12 @@
     feature = "unstable",
     feature(generic_const_exprs, const_fn_floating_point_arithmetic)
 )]
-// #![no_std]
+#![no_std]
 #![doc = include_str!("../README.md")]
+
+#[cfg(test)]
+#[macro_use]
+extern crate std;
 
 mod base;
 
@@ -20,6 +24,7 @@ pub use proc_macro::{gen_ascii_match, gen_char_match};
 
 pub use base::Base;
 pub use base_impl::Base58btc;
+#[cfg(feature = "unstable")]
 pub use utf_base::UtfBase;
 
 #[derive(Debug)]
@@ -33,6 +38,7 @@ pub enum DecodeError {
 
 #[cfg(test)]
 mod tests {
+
     use crate::{base::*, Base58btc};
 
     // TODO: make tests for multi byte chars

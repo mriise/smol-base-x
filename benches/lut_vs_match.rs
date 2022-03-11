@@ -8,19 +8,6 @@ use smol_base_x::{
     Base,
 };
 
-/// base58 style LUT see C++ for original usage
-const fn gen_lut<const BASE: usize>(alphabet: &[u8; BASE]) -> [i8; 256] {
-    let mut lut = [-1_i8; 256];
-
-    let mut i = 0;
-    while i < alphabet.len() {
-        lut[alphabet[i] as usize] = i as i8;
-        i += 1;
-    }
-
-    lut
-}
-
 #[derive(Debug, Default)]
 pub struct Base58Match {}
 
@@ -44,8 +31,9 @@ impl Base<58> for Base58LUT {
         const_str::to_byte_array!("123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz");
 
     fn lookup_ascii(ch: u8) -> Option<usize> {
-        const LUT: [i8; 256] =
-            gen_lut::<58>(b"123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz");
+        const LUT: [i8; 256] = smol_base_x::util::gen_lut::<58>(
+            b"123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz",
+        );
 
         let ch = LUT[ch as usize];
         match ch {
@@ -101,8 +89,8 @@ pub fn random_lut_vs_match(c: &mut Criterion) {
         encoded.push(String::from_utf8_lossy(&buf[..size]).to_string());
     }
 
-    let mut buf = [0u8; 32]; // the whole benchmark uses only this buffer as decode assumes it is empty
-    let mut buf = &mut buf[..decoded_size(58, encoded_size(58, 32))];
+    let mut buf = [0u8; 32]; // the whole benchmark uses only this buffer as it will fill it with zeroes on its own
+    let buf = &mut buf[..decoded_size(58, encoded_size(58, 32))];
 
     let mut group = c.benchmark_group("random_ascii_lut");
     for (i, str) in encoded.iter().enumerate() {
@@ -110,7 +98,6 @@ pub fn random_lut_vs_match(c: &mut Criterion) {
         group.bench_with_input(BenchmarkId::from_parameter(i), str, |b, str| {
             b.iter(|| {
                 Base58LUT::decode_mut(black_box(str), black_box(buf)).unwrap();
-                buf.fill(0);
             });
         });
     }
@@ -122,12 +109,11 @@ pub fn random_lut_vs_match(c: &mut Criterion) {
         group.bench_with_input(BenchmarkId::from_parameter(i), str, |b, str| {
             b.iter(|| {
                 Base58Match::decode_mut(black_box(str), black_box(buf)).unwrap();
-                buf.fill(0);
             });
         });
     }
     group.finish();
 }
 
-criterion_group!(benches, lut_vs_match, random_lut_vs_match);
+criterion_group!(benches, random_lut_vs_match);
 criterion_main!(benches);

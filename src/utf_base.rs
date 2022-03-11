@@ -13,7 +13,7 @@ pub trait UtfBase<const BASE: usize> {
     const BASE: usize = Self::ALPHABET.len();
 
     /// The longest length char (in bytes) of the alphabet always 1-4
-    const MAX_CHAR_LEN: u8 = max_utf8_char_len(Self::ALPHABET);
+    const MAX_CHAR_LEN: usize = max_utf8_char_len(Self::ALPHABET);
 
     // returns bytes written to buffer
     fn utf_decode_mut<I: AsRef<str>>(input: I, buf: &mut [u8]) -> Result<usize, DecodeError> {
@@ -205,6 +205,8 @@ pub trait UtfBase<const BASE: usize> {
     ) -> Result<([u8; decoded_arr_size(Self::BASE, CHARS)], &'a [u8]), DecodeError> {
         let mut arr = [0u8; decoded_arr_size(Self::BASE, CHARS)];
 
+        // let buf: &[u8] = Self::ALPHABET;
+
         todo!();
         // Ok(arr)
     }
@@ -213,8 +215,8 @@ pub trait UtfBase<const BASE: usize> {
     /// output is `(encoded chars, chars written)`
     fn utf_encode_arr<const BYTES: usize>(
         input: &[u8; BYTES],
-    ) -> Result<[char; encoded_arr_size(Self::BASE, BYTES)], DecodeError> {
-        let mut arr = [0u8; encoded_arr_size(Self::BASE, BYTES)];
+    ) -> Result<[char; encoded_arr_size(Self::BASE, BYTES) * Self::MAX_CHAR_LEN], DecodeError> {
+        let mut arr = [0u8; encoded_arr_size(Self::BASE, BYTES) * Self::MAX_CHAR_LEN];
 
         todo!()
     }

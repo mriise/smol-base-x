@@ -5,9 +5,9 @@ TODO: Determine what the Array API should look like
 
 This requires a nightly compiler to use the array API.
 
-Features used:
+Features used under the 'unstable' flag:
 * const_fn_floating_point_arithmetic
-* generic_const_exprs (under the 'unstable' flag since it is still incomplete)
+* generic_const_exprs
 
 Implementing a new Alphabet is rather simple:
 ```rust
@@ -17,12 +17,9 @@ pub struct Base58 {}
 impl Base<58> for Base58 {
     const ALPHABET: [u8; 58] =
         const_str::to_byte_array!("123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz");
-
-    fn lookup_ascii(ch: u8) -> Option<usize> {
-        smol_base_x::gen_ascii_match!(
-            ch,
-            b"123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
-        )
-    }
 }
 ```
+
+Implementing `Base` will automatically generate a 256 byte LUT, which was chosen over a match statement based off of benchmarks in `benches/lut_vs_matches`
+
+this lib provides a macro for generating a match statement equivalent to a LUT, which may save on space but is mostly useful for when dealing with non-ascii alphabets (which are currently unsupported).
