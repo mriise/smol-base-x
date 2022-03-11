@@ -22,4 +22,4 @@ impl Base<58> for Base58 {
 
 Implementing `Base` will automatically generate a 256 byte LUT, which was chosen over a match statement based off of benchmarks in `benches/lut_vs_matches`
 
-this lib provides a macro for generating a match statement equivalent to a LUT, which may save on space but is mostly useful for when dealing with non-ascii alphabets (which are currently unsupported).
+this lib provides a macro for generating a match statement equivalent to a LUT, but is mostly useful for when dealing with non-ascii alphabets (which are currently unsupported).
