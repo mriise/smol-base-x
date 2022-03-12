@@ -13,7 +13,7 @@ pub struct Base58Match {}
 
 impl Base<58> for Base58Match {
     const ALPHABET: [u8; 58] =
-        const_str::to_byte_array!("123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz");
+        *b"123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 
     fn lookup_ascii(ch: u8) -> Option<usize> {
         smol_base_x::gen_ascii_match!(
@@ -28,7 +28,7 @@ pub struct Base58LUT {}
 
 impl Base<58> for Base58LUT {
     const ALPHABET: [u8; 58] =
-        const_str::to_byte_array!("123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz");
+        *b"123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 
     fn lookup_ascii(ch: u8) -> Option<usize> {
         const LUT: [i8; 256] = smol_base_x::util::gen_lut::<58>(

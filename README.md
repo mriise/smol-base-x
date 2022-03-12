@@ -15,8 +15,7 @@ use smol_base_x::*;
 pub struct Base58 {}
 
 impl Base<58> for Base58 {
-    const ALPHABET: [u8; 58] =
-        const_str::to_byte_array!("123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz");
+    const ALPHABET: [u8; 58] = *b"123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 }
 ```
 
