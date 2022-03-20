@@ -12,8 +12,7 @@ use smol_base_x::{
 pub struct Base58Match {}
 
 impl Base<58> for Base58Match {
-    const ALPHABET: [u8; 58] =
-        *b"123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
+    const ALPHABET: [u8; 58] = *b"123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 
     fn lookup_ascii(ch: u8) -> Option<usize> {
         smol_base_x::gen_ascii_match!(
@@ -27,8 +26,7 @@ impl Base<58> for Base58Match {
 pub struct Base58LUT {}
 
 impl Base<58> for Base58LUT {
-    const ALPHABET: [u8; 58] =
-        *b"123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
+    const ALPHABET: [u8; 58] = *b"123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 
     fn lookup_ascii(ch: u8) -> Option<usize> {
         const LUT: [i8; 256] = smol_base_x::util::gen_lut::<58>(
@@ -89,7 +87,8 @@ pub fn random_lut_vs_match(c: &mut Criterion) {
         encoded.push(String::from_utf8_lossy(&buf[..size]).to_string());
     }
 
-    let mut buf = [0u8; 32]; // the whole benchmark uses only this buffer as it will fill it with zeroes on its own
+    // buff is 33 bytes because it will sometimes overestimmate the required bytes by one
+    let mut buf = [0u8; 33]; // the whole benchmark uses only this buffer as it will fill it with zeroes on its own
     let buf = &mut buf[..decoded_size(58, encoded_size(58, 32))];
 
     let mut group = c.benchmark_group("random_ascii_lut");

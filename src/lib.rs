@@ -133,4 +133,50 @@ mod tests {
 
         assert!(output == expected);
     }
+
+    #[test]
+    #[cfg(feature = "unstable")]
+    fn arr_decode() {
+        let (output, written) = Base58btc::decode_arr(*b"ZiCa").unwrap();
+
+        let expected = b"abc";
+
+        println!("{:x?}\n{:x?}", &output[..written], &expected.as_slice());
+
+        assert!(&output[..written] == expected.as_ref());
+    }
+
+    #[test]
+    #[cfg(feature = "unstable")]
+    fn arr_encode() {
+        let (output, written) = Base58btc::encode_arr(*b"abc").unwrap();
+
+        let expected = "ZiCa";
+
+        let output = core::str::from_utf8(&output[..written]).unwrap();
+        println!("{:x?}\n{:x?}", output, expected);
+
+        assert!(output == expected);
+    }
+
+    #[test]
+    #[cfg(feature = "unstable")]
+    fn size_util() {
+        use crate::util::{const_arr_size::*, self};
+
+        for base in 2..98 {
+            // println!("- base {base}");
+            for size in 1..256 {
+                // println!("-- size {size}");
+                // println!("de {} : {}", util::decoded_size(base, size), decoded_arr_size(base, size));
+                assert_eq!(util::decoded_size(base, size), decoded_arr_size(base, size));
+        
+                // println!("en {} : {}", util::encoded_size(base, size), encoded_arr_size(base, size));
+                assert_eq!(util::encoded_size(base, size), encoded_arr_size(base, size));
+            }
+
+        }
+
+
+    }
 }

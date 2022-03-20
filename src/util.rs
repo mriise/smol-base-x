@@ -2,15 +2,19 @@
 pub use const_arr_size::*;
 
 /// generates the final decoded ceiling for a given base to be used as the slice size
-/// given as `(input_byte_size * (log10(base) / log10(256)) + 1.0`
+/// given as `(input_byte_size * (log10(base) / log10(256))`  
+/// 
+/// **This is rounded up** it will sometimes say it needs one byte bigger than what it needs
 pub fn decoded_size(base: usize, input_byte_size: usize) -> usize {
-    (input_byte_size as f64 * (log10(base) / log10(256_usize))) as usize
+    (input_byte_size as f32 * (log10(base) / log10(256_usize)) + 1.0) as usize
 }
 
 /// generates the final encoded ceiling for a given base to be used as the slice size
-/// given as `input_byte_size * (log10(256) / log10(base))`
+/// given as `input_byte_size * (log10(256) / log10(base))`  
+/// 
+/// **This is rounded up** it will sometimes say it needs one byte bigger than what it needs
 pub fn encoded_size(base: usize, input_byte_size: usize) -> usize {
-    (input_byte_size as f64 * (log10(256_usize) / log10(base)) + 1.0) as usize
+    (input_byte_size as f32 * (log10(256_usize) / log10(base)) + 1.0) as usize
 }
 
 /// takes an array of ascii chars and fills a char array of the same length
@@ -59,9 +63,9 @@ pub(crate) fn is_zero(buf: &[u8]) -> bool {
         && aligned.iter().all(|&x| x == 0)
 }
 
-fn ln(x: usize) -> f64 {
+fn ln(x: f32) -> f32 {
     let mut old_sum = 0.0;
-    let xmlxpl = (x as f64 - 1.0) / (x as f64 + 1.0);
+    let xmlxpl = (x - 1.0) / (x + 1.0);
     let xmlxpl_2 = xmlxpl * xmlxpl;
     let mut denom = 1.0;
     let mut frac = xmlxpl;
@@ -77,32 +81,32 @@ fn ln(x: usize) -> f64 {
     return 2.0 * sum;
 }
 
-fn log10(x: usize) -> f64 {
-    return ln(x) / core::f64::consts::LN_10;
+fn log10(x: usize) -> f32 {
+    return ln(x as f32) / core::f32::consts::LN_10;
 }
 
 #[cfg(feature = "unstable")]
-mod const_arr_size {
+pub(crate) mod const_arr_size {
 
     /// generates the final decoded ceiling for a given base to be used as the allocated array size
-    /// given as `input_byte_size * (log10(256) / log10(base))`
+    /// given as `input_byte_size * (log10(256) / log10(base)) rounded up`
     pub const fn decoded_arr_size(base: usize, input_byte_size: usize) -> usize {
-        (input_byte_size as f64 * (log10(base) / log10(256))) as usize
+        (input_byte_size as f32 * (log10(base) / log10(256)) + 1.0) as usize
     }
     /// generates the final encoded ceiling for a given base to be used as the allocated array size
-    /// given as `(input_byte_size * (log10(base) / log10(256)) + 1.0`
+    /// given as `(input_byte_size * (log10(base) / log10(256)) rounded up`
     pub const fn encoded_arr_size(base: usize, input_byte_size: usize) -> usize {
-        (input_byte_size as f64 * (log10(256) / log10(base)) + 1.0) as usize
+        (input_byte_size as f32 * (log10(256) / log10(base)) + 1.0) as usize
     }
 
-    const fn log10(x: usize) -> f64 {
-        return ln(x) / core::f64::consts::LN_10;
+    const fn log10(x: usize) -> f32 {
+        return ln(x as f32) / core::f32::consts::LN_10;
     }
 
     // https://stackoverflow.com/questions/35968963/trying-to-calculate-logarithm-base-10-without-math-h-really-close-just-having
-    const fn ln(x: usize) -> f64 {
+    pub(crate) const fn ln(x: f32) -> f32 {
         let mut old_sum = 0.0;
-        let xmlxpl = (x as f64 - 1.0) / (x as f64 + 1.0);
+        let xmlxpl = (x - 1.0) / (x + 1.0);
         let xmlxpl_2 = xmlxpl * xmlxpl;
         let mut denom = 1.0;
         let mut frac = xmlxpl;
