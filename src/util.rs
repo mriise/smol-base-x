@@ -3,7 +3,7 @@ pub use const_arr_size::*;
 
 /// generates the final decoded ceiling for a given base to be used as the slice size
 /// given as `(input_byte_size * (log10(base) / log10(256))`  
-/// 
+///
 /// **This is rounded up** it will sometimes say it needs one byte bigger than what it needs
 pub fn decoded_size(base: usize, input_byte_size: usize) -> usize {
     (input_byte_size as f32 * (log10(base) / log10(256_usize)) + 1.0) as usize
@@ -11,7 +11,7 @@ pub fn decoded_size(base: usize, input_byte_size: usize) -> usize {
 
 /// generates the final encoded ceiling for a given base to be used as the slice size
 /// given as `input_byte_size * (log10(256) / log10(base))`  
-/// 
+///
 /// **This is rounded up** it will sometimes say it needs one byte bigger than what it needs
 pub fn encoded_size(base: usize, input_byte_size: usize) -> usize {
     (input_byte_size as f32 * (log10(256_usize) / log10(base)) + 1.0) as usize
@@ -78,11 +78,11 @@ fn ln(x: f32) -> f32 {
         frac *= xmlxpl_2;
         sum += frac / denom;
     }
-    return 2.0 * sum;
+    2.0 * sum
 }
 
 fn log10(x: usize) -> f32 {
-    return ln(x as f32) / core::f32::consts::LN_10;
+    ln(x as f32) / core::f32::consts::LN_10
 }
 
 #[cfg(feature = "unstable")]
@@ -100,7 +100,7 @@ pub(crate) mod const_arr_size {
     }
 
     const fn log10(x: usize) -> f32 {
-        return ln(x as f32) / core::f32::consts::LN_10;
+        ln(x as f32) / core::f32::consts::LN_10
     }
 
     // https://stackoverflow.com/questions/35968963/trying-to-calculate-logarithm-base-10-without-math-h-really-close-just-having
@@ -119,6 +119,6 @@ pub(crate) mod const_arr_size {
             frac *= xmlxpl_2;
             sum += frac / denom;
         }
-        return 2.0 * sum;
+        2.0 * sum
     }
 }

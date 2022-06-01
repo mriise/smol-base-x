@@ -153,7 +153,7 @@ pub trait Base<const BASE: usize> {
 
         let mut length = 0;
 
-        while let Some(&ch) = iter.next() {
+        for &ch in iter {
             let mut carry = ch as usize;
 
             let mut i = 0;
@@ -200,7 +200,7 @@ pub trait Base<const BASE: usize> {
 
     /// output is `(decoded bytes, bytes written)`
     #[cfg(feature = "unstable")]
-    fn decode_arr<'a, const LEN: usize, I: Into<[u8; LEN]>>(
+    fn decode_arr<const LEN: usize, I: Into<[u8; LEN]>>(
         input: I,
     ) -> Result<([u8; decoded_arr_size(BASE, LEN)], usize), DecodeError> {
         let input = input.into();
@@ -323,7 +323,7 @@ pub trait Base<const BASE: usize> {
 
         let mut length = 0;
 
-        while let Some(&ch) = iter.next() {
+        for &ch in iter {
             let mut carry = ch as usize;
 
             let mut i = 0;

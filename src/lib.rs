@@ -162,7 +162,7 @@ mod tests {
     #[test]
     #[cfg(feature = "unstable")]
     fn size_util() {
-        use crate::util::{const_arr_size::*, self};
+        use crate::util::{self, const_arr_size::*};
 
         for base in 2..98 {
             // println!("- base {base}");
@@ -170,13 +170,10 @@ mod tests {
                 // println!("-- size {size}");
                 // println!("de {} : {}", util::decoded_size(base, size), decoded_arr_size(base, size));
                 assert_eq!(util::decoded_size(base, size), decoded_arr_size(base, size));
-        
+
                 // println!("en {} : {}", util::encoded_size(base, size), encoded_arr_size(base, size));
                 assert_eq!(util::encoded_size(base, size), encoded_arr_size(base, size));
             }
-
         }
-
-
     }
 }
