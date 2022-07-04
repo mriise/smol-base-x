@@ -1,8 +1,13 @@
 [package]
-name = "match_lookup"
+name = "match-lookup"
 version = "0.1.0"
+authors = ["mriise <me@mriise.net>"]
+description = "proc macro for generating match block for alphabets, please dont use this. its slow and extremly likely to not be what you are looking for."
 edition = "2021"
-publish = false
+repository = "https://github.com/mriise/smol-base-x"
+keywords = ["base", "base-x"]
+categories = ["no_std"]
+license = "MIT"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
