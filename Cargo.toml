@@ -6,7 +6,7 @@ description = "no-std centric implementation of base-x"
 edition = "2021"
 repository = "https://github.com/mriise/smol-base-x"
 keywords = ["base", "base-x"]
-categories = ["no_std"]
+categories = ["no-std"]
 license = "MIT"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
