@@ -1,3 +1,5 @@
+// benches to be sure I was insane when I was thinking that match statements would be faster than a LUT
+
 use criterion::{
     black_box, criterion_group, criterion_main, BenchmarkId, Criterion, Throughput::Bytes,
 };

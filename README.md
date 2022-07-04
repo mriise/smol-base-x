@@ -1,8 +1,5 @@
 ## A no_std centric implementation of base-x
 
-
-TODO: Determine what the Array API should look like
-
 This requires a nightly compiler to use the array API.
 
 Features used under the 'unstable' flag:
@@ -21,4 +18,4 @@ impl Base<58> for Base58 {
 
 Implementing `Base` will automatically generate a 256 byte LUT, which was chosen over a match statement based off of benchmarks in `benches/lut_vs_matches`
 
-this lib provides a macro for generating a match statement equivalent to a LUT, but is mostly useful for when dealing with non-ascii alphabets (which are currently unsupported).
+this lib provides a macro under unstable for generating a match statement equivalent to a LUT, but is mostly useful for when dealing with non-ascii alphabets (which are currently unmaintained).

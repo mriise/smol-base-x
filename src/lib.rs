@@ -12,22 +12,27 @@ extern crate std;
 mod base;
 
 mod base_impl;
+#[cfg(feature = "unstable")]
 mod utf_base;
 
-/// encode/decode_arr need to use log in order to estimate the size, which is why unstable floating point arithmetic is needed
-/// since there is also no const fn for log, there is an implementation of log10 hidden
-///
-/// one day the log implemenation should be replaced with the proper function when it comes out   
+/// `encode`/`decode_arr` need to use `log10` in order to estimate the size of the output.
+/// Since there is no `log10` in core or in const scopes, there is are custom implementations of log10.
+/// One day (soon™) the log implemenation should be replaced with the proper function from rustlang
 pub mod util;
 
-pub use proc_macro::{gen_ascii_match, gen_char_match};
+#[cfg(feature = "unstable")]
+/// proc macros for generating match statments for alphabets
+pub use match_lookup::{gen_ascii_match, gen_char_match};
 
 pub use base::Base;
-pub use base_impl::Base58btc;
+pub use base_impl::*;
 #[cfg(feature = "unstable")]
+/// UTF base shoudn't really be used (especially if you are reaching for this crate) and the implementation is probably broken
 pub use utf_base::UtfBase;
 
 #[derive(Debug)]
+/// when decode/encode returns this, it is safe to assume passed in buffer has partially written data.
+/// Both functions assume input buffers are zeroed, so do that before re-using the same buffer.
 pub enum DecodeError {
     /// invalid len where `usize` is the min size expected
     InvalidLength(usize),
@@ -41,45 +46,46 @@ mod tests {
 
     use crate::{base::*, Base58btc};
 
-    // TODO: make tests for multi byte chars
+    #[cfg(feature = "unstable")]
+    mod proc_macro {
+        #[test]
+        fn utf_char() {
+            fn proc(ch: char) -> Option<usize> {
+                match_lookup::gen_char_match!(ch, "abc")
+            }
 
-    #[test]
-    fn char_proc_macro() {
-        fn proc(ch: char) -> Option<usize> {
-            proc_macro::gen_char_match!(ch, "abc")
-        }
+            fn normal(ch: char) -> Option<usize> {
+                match ch {
+                    'a' => Some(0),
+                    'b' => Some(1),
+                    'c' => Some(2),
+                    _ => None,
+                }
+            }
 
-        fn normal(ch: char) -> Option<usize> {
-            match ch {
-                'a' => Some(0),
-                'b' => Some(1),
-                'c' => Some(2),
-                _ => None,
+            for ch in ['a', 'b', 'c'] {
+                assert_eq!(proc(ch).unwrap(), normal(ch).unwrap());
             }
         }
 
-        for ch in ['a', 'b', 'c'] {
-            assert_eq!(proc(ch).unwrap(), normal(ch).unwrap());
-        }
-    }
-
-    #[test]
-    fn ascii_proc_macro() {
-        fn proc(ch: u8) -> Option<usize> {
-            proc_macro::gen_ascii_match!(ch, b"abc")
-        }
-
-        fn normal(ch: u8) -> Option<usize> {
-            match ch {
-                97 => Some(0), // a
-                98 => Some(1), // b
-                99 => Some(2), // c
-                _ => None,
+        #[test]
+        fn ascii() {
+            fn proc(ch: u8) -> Option<usize> {
+                match_lookup::gen_ascii_match!(ch, b"abc")
             }
-        }
 
-        for ch in ['a', 'b', 'c'] {
-            assert_eq!(proc(ch as u8).unwrap(), normal(ch as u8).unwrap());
+            fn normal(ch: u8) -> Option<usize> {
+                match ch {
+                    97 => Some(0), // a
+                    98 => Some(1), // b
+                    99 => Some(2), // c
+                    _ => None,
+                }
+            }
+
+            for ch in ['a', 'b', 'c'] {
+                assert_eq!(proc(ch as u8).unwrap(), normal(ch as u8).unwrap());
+            }
         }
     }
 

@@ -10,7 +10,7 @@ pub trait Base<const BASE: usize> {
     const BASE: usize = Self::ALPHABET.len();
 
     /// decode input base encoding into buffer
-    /// it is assumed buf might be non-zeroed and will be filled with zero at the start
+    /// please do not pass in a non-empty buffer (this will output garbled data).
     ///
     /// ```rust
     /// use smol_base_x::*;
@@ -23,7 +23,6 @@ pub trait Base<const BASE: usize> {
     /// ```
     fn decode_mut<I: AsRef<[u8]>>(input: I, buf: &mut [u8]) -> Result<usize, DecodeError> {
         let input = input.as_ref();
-        buf.fill(0);
 
         if !input.is_ascii() {
             return Err(DecodeError::InvalidChar);
@@ -51,7 +50,7 @@ pub trait Base<const BASE: usize> {
             }
         }
 
-        // in C++ this is used to allocate a vec, but this will overestimate if there are trailing zeroes
+        // in C++ this is used to allocate a vec, but this will overestimate if there are trailing zeroes in the input
         // let size = decoded_size(Self::BASE, iter.len());
         // if size + ones > buf.len() {
         //     return Err(DecodeError::InvalidLength(size + ones));
@@ -112,8 +111,8 @@ pub trait Base<const BASE: usize> {
     }
 
     /// output buff is intentionally a slice since `&mut str` is essentially useless
-    /// users will have to convert output bytes into a str
-    /// it is assumed buf might be non-zeroed and will be filled with zero at the start
+    /// users will have to convert output bytes into a str.
+    /// it is assumed buf is zeroed, passing one in that isn't will produce garbage (and extremely likely not valid UTF-8) data.
     ///
     /// ```rust
     /// use smol_base_x::*;
@@ -129,7 +128,7 @@ pub trait Base<const BASE: usize> {
     /// ```
     fn encode_mut<I: AsRef<[u8]>>(input: I, buf: &mut [u8]) -> Result<usize, DecodeError> {
         let input = input.as_ref();
-        buf.fill(0);
+
         // thanks to https://sts10.github.io/2020/10/06/peeking-the-pivot.html for the great notes on iterators with look ahead
         let mut iter = input.iter().peekable();
 

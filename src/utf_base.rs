@@ -171,7 +171,7 @@ pub trait UtfBase<const BASE: usize> {
     /// C++ algorithim uses a \[i8; 256] LUT
     ///
     /// since we want to use any UTF-8, we instead generate a match statement for each char
-    /// the result should be smaller and might actually be faster (TODO check this) than using a LUT while allow use of UTF-8 as well
+    /// the result is slower than using UTF-8, but doesnt eat up memory generating a massive LUT
     ///
     /// **NOTE:** associated const char array and alphabet used in the macro should be the exact same
     ///

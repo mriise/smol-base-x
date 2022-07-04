@@ -17,6 +17,7 @@ pub fn encoded_size(base: usize, input_byte_size: usize) -> usize {
     (input_byte_size as f32 * (log10(256_usize) / log10(base)) + 1.0) as usize
 }
 
+#[cfg(feature = "unstable")]
 /// takes an array of ascii chars and fills a char array of the same length
 /// shouldnt be necessary for users as Base<BASE> has a blanket impl for `UtfBase<BASE>`
 pub(crate) const fn ascii_to_char_arr<const S: usize>(ascii: [u8; S]) -> [char; S] {
@@ -29,6 +30,8 @@ pub(crate) const fn ascii_to_char_arr<const S: usize>(ascii: [u8; S]) -> [char; 
     arr
 }
 
+#[cfg(feature = "unstable")]
+/// takes an array of utf-8 chars and returns the largest char lenth (in bytes)
 pub(crate) const fn max_utf8_char_len<const S: usize>(chars: [char; S]) -> usize {
     let mut max = 0;
     let mut ch = 0;
@@ -54,14 +57,18 @@ pub const fn gen_lut<const BASE: usize>(alphabet: &[u8; BASE]) -> [i8; 256] {
     lut
 }
 
-/// is_zeroed speedup hack from https://stackoverflow.com/questions/65367552/checking-a-vecu8-to-see-if-its-all-zero
-pub(crate) fn is_zero(buf: &[u8]) -> bool {
-    let (prefix, aligned, suffix) = unsafe { buf.align_to::<u64>() };
+// an alternative to just letting the user pass in non-zeroed buffers (or just zero every time)
 
-    prefix.iter().all(|&x| x == 0)
-        && suffix.iter().all(|&x| x == 0)
-        && aligned.iter().all(|&x| x == 0)
-}
+// /// is_zeroed speedup hack from https://stackoverflow.com/questions/65367552/checking-a-vecu8-to-see-if-its-all-zero
+// pub(crate) fn is_zero(buf: &[u8]) -> bool {
+//     let (prefix, aligned, suffix) = unsafe { buf.align_to::<u64>() };
+
+//     prefix.iter().all(|&x| x == 0)
+//         && suffix.iter().all(|&x| x == 0)
+//         && aligned.iter().all(|&x| x == 0)
+// }
+
+// custom ln and log10
 
 fn ln(x: f32) -> f32 {
     let mut old_sum = 0.0;
@@ -81,6 +88,7 @@ fn ln(x: f32) -> f32 {
     2.0 * sum
 }
 
+/// log10 is not avaliable in `core::*`
 fn log10(x: usize) -> f32 {
     ln(x as f32) / core::f32::consts::LN_10
 }
