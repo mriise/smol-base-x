@@ -10,7 +10,7 @@ categories = ["no_std"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-match_lookup = { version = "*", path = "match_lookup", optional = true }
+match_lookup = { version = "*", path = "./match_lookup", optional = true }
 const-str = { version = "0.3.2", optional = true }
 
 [dev-dependencies]
