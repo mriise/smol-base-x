@@ -2,15 +2,17 @@
 name = "smol-base-x"
 version = "0.1.0"
 authors = ["mriise <me@mriise.net>"]
+description = "no-std centric implementation of base-x"
 edition = "2021"
 repository = "https://github.com/mriise/smol-base-x"
 keywords = ["base", "base-x"]
 categories = ["no_std"]
+license = "MIT"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-match_lookup = { version = "*", path = "./match_lookup", optional = true }
+match-lookup = { version = "0.1.0", path = "./match_lookup", optional = true }
 const-str = { version = "0.3.2", optional = true }
 
 [dev-dependencies]
@@ -24,6 +26,7 @@ name = "lut_vs_match"
 harness = false
 
 [features]
-unstable = ["const-str", "match_lookup"]
+unstable = ["const-str", "match-lookup"]
 
 default = []
+

@@ -1,4 +1,4 @@
 /target
 Cargo.lock
-/proc_macro/target
+/match_lookup/target/
 .vscode
