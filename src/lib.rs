@@ -44,7 +44,7 @@ pub enum DecodeError {
 #[cfg(test)]
 mod tests {
 
-    use crate::{base::*, Base58btc};
+    use crate::{base::*, Base58Btc};
 
     #[cfg(feature = "unstable")]
     mod proc_macro {
@@ -94,7 +94,7 @@ mod tests {
         let input = "44Y6qTgSvRMkdqpQ5ufkN";
         let mut output = [0u8; 128];
 
-        let written = Base58btc::decode_mut(input, &mut output).unwrap();
+        let written = Base58Btc::decode_mut(input, &mut output).unwrap();
         let expected = hex::decode("6d691bdd736346aa5a0a95b373b2ab").unwrap();
 
         println!("{:x?}\n{:x?}", &output[..written], &expected.as_slice());
@@ -106,7 +106,7 @@ mod tests {
         input.copy_from_slice(&output);
         output.fill(0);
 
-        let written = Base58btc::encode_mut(&input[..written], &mut output).unwrap();
+        let written = Base58Btc::encode_mut(&input[..written], &mut output).unwrap();
 
         println!("{:x?}\n{:x?}", &output[..written], expected.as_bytes());
         assert!(&output[..written] == expected.as_bytes());
@@ -116,7 +116,7 @@ mod tests {
     fn abc_decode() {
         let mut output = [0u8; 32];
 
-        let written = Base58btc::decode_mut("ZiCa", &mut output).unwrap();
+        let written = Base58Btc::decode_mut("ZiCa", &mut output).unwrap();
 
         let expected = b"abc";
 
@@ -129,7 +129,7 @@ mod tests {
     fn abc_encode() {
         let mut output = [0u8; 32]; // 3 spaces takes the same space as 'abc'
 
-        let written = Base58btc::encode_mut("abc", &mut output).unwrap();
+        let written = Base58Btc::encode_mut("abc", &mut output).unwrap();
 
         let expected = "ZiCa";
 
@@ -143,7 +143,7 @@ mod tests {
     #[test]
     #[cfg(feature = "unstable")]
     fn arr_decode() {
-        let (output, written) = Base58btc::decode_arr(*b"ZiCa").unwrap();
+        let (output, written) = Base58Btc::decode_arr(*b"ZiCa").unwrap();
 
         let expected = b"abc";
 
@@ -155,7 +155,7 @@ mod tests {
     #[test]
     #[cfg(feature = "unstable")]
     fn arr_encode() {
-        let (output, written) = Base58btc::encode_arr(*b"abc").unwrap();
+        let (output, written) = Base58Btc::encode_arr(*b"abc").unwrap();
 
         let expected = "ZiCa";
 

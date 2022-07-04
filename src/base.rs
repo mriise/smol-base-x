@@ -16,7 +16,7 @@ pub trait Base<const BASE: usize> {
     /// use smol_base_x::*;
     ///
     /// let mut buf = [0u8; 16];
-    /// let bytes_written = Base58btc::decode_mut("ZiCa", &mut buf).unwrap();
+    /// let bytes_written = Base58Btc::decode_mut("ZiCa", &mut buf).unwrap();
     ///
     /// let expected = b"abc";
     /// assert_eq!(&buf[..bytes_written], expected.as_slice());
@@ -118,7 +118,7 @@ pub trait Base<const BASE: usize> {
     /// use smol_base_x::*;
     ///
     /// let mut buf = [0u8; 16];
-    /// let bytes_written = Base58btc::encode_mut("abc", &mut buf).unwrap();
+    /// let bytes_written = Base58Btc::encode_mut("abc", &mut buf).unwrap();
     ///
     /// // Here
     /// let output = core::str::from_utf8(&buf[..bytes_written]).unwrap();
