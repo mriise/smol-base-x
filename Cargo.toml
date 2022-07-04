@@ -1,7 +1,11 @@
 [package]
 name = "smol-base-x"
 version = "0.1.0"
+authors = ["mriise <me@mriise.net>"]
 edition = "2021"
+repository = "https://github.com/mriise/smol-base-x"
+keywords = ["base", "base-x"]
+categories = ["no_std"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
