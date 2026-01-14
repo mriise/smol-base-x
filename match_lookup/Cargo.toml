@@ -1,6 +1,6 @@
 [package]
 name = "match-lookup"
-version = "0.1.1"
+version = "0.1.2"
 authors = ["mriise <me@mriise.net>"]
 description = "proc macro for generating match block for alphabets, please dont use this. its slow and extremly likely to not be what you are looking for."
 edition = "2021"
