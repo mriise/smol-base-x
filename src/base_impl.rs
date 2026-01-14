@@ -28,4 +28,4 @@ base!(Base67, 67 b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz012345678
 
 // etc
 base!(Base10, 10 b"0123456789");
-base!(Base58Flickr, 58 b"123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz");
+base!(Base58Flickr, 58 b"123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ");

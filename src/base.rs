@@ -39,22 +39,20 @@ pub trait Base<const BASE: usize> {
             }
         }
 
-        // skip & count leading '1's.
-        let mut ones = 0;
+        // skip & count leading zeros (first alphabet char represents zero)
+        let mut zero_chars = 0;
         while let Some(&&ch) = iter.peek() {
-            if ch == b'1' {
-                ones += 1;
+            if ch == Self::ALPHABET[0] {
+                zero_chars += 1;
                 iter.next();
+                // Early check: if leading zeros alone exceed buffer, fail fast
+                if zero_chars > buf.len() {
+                    return Err(DecodeError::InvalidLength(zero_chars));
+                }
             } else {
                 break;
             }
         }
-
-        // in C++ this is used to allocate a vec, but this will overestimate if there are trailing zeroes in the input
-        // let size = decoded_size(Self::BASE, iter.len());
-        // if size + ones > buf.len() {
-        //     return Err(DecodeError::InvalidLength(size + ones));
-        // }
 
         let mut length = 0;
 
@@ -87,15 +85,17 @@ pub trait Base<const BASE: usize> {
                 }
             }
 
-            length = i;
-            if length + ones > buf.len() {
-                return Err(DecodeError::InvalidLength(length));
+            // If carry is non-zero, buffer was too small
+            if carry != 0 {
+                return Err(DecodeError::InvalidLength(buf.len() + 1));
             }
 
-            // generally we dont want to panic in release if we can avoid it, consider using debug_assert
-            assert!(carry == 0);
+            length = i;
+            if length + zero_chars > buf.len() {
+                return Err(DecodeError::InvalidLength(length + zero_chars));
+            }
         }
-        length += ones;
+        length += zero_chars;
 
         // Skip trailing spaces.
         while let Some(&&ch) = iter.peek() {

@@ -24,23 +24,16 @@ pub trait UtfBase<const BASE: usize> {
             iter.next();
         }
 
-        // Skip and count leading '1's.
+        // Skip and count leading zeros (first alphabet char represents zero)
         let mut zeroes = 0;
 
-        while iter.peek() == Some(&'1') {
+        while iter.peek() == Some(&Self::ALPHABET[0]) {
             iter.next();
             zeroes += 1;
             if zeroes > buf.len() {
-                return Err(DecodeError::InvalidLength(zeroes)); // right???
+                return Err(DecodeError::InvalidLength(zeroes));
             }
         }
-
-        // Allocate enough space in big-endian base256 representation.
-        // clone probably gets optimized to copy here? size_hint() may be better but IDK really
-        let size = decoded_size(Self::BASE, iter.clone().count());
-
-        // TODO: remove the iterator count if possible this doesnt account for things!!AHH
-        // let mut arr: &[u8] = &backing[0..gen_decoded_size(Self::ALPHABET, input.chars().count())];
 
         let mut length = 0;
 
@@ -76,7 +69,9 @@ pub trait UtfBase<const BASE: usize> {
             assert!(carry == 0);
         }
         // Skip trailing spaces.
-        while iter.next() == Some(' ') {} // this might ignore a single char after the last space
+        while iter.peek() == Some(&' ') {
+            iter.next();
+        }
 
         if iter.next().is_some() {
             return Err(DecodeError::CharAfterTrailingSpaces);
