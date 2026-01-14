@@ -1,6 +1,6 @@
 [package]
 name = "smol-base-x"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["mriise <me@mriise.net>"]
 description = "no-std centric implementation of base-x"
 edition = "2021"
