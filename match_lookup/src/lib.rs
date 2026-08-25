@@ -51,7 +51,8 @@ pub fn gen_char_match(input: TokenStream) -> TokenStream {
     let cases = alphabet.value();
 
     let mut arms: Vec<Arm> = cases
-        .char_indices()
+        .chars()
+        .enumerate()
         .map(|(i, ch)| -> Arm { parse_quote!(#ch => Some(#i),) })
         .collect();
 

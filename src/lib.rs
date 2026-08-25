@@ -68,6 +68,23 @@ mod tests {
             }
         }
 
+        /// Regression: indices must be char ordinals, not UTF-8 byte offsets.
+        /// match-lookup 0.1.2 used `char_indices()` and broke every multi-byte
+        /// alphabet (multiformats/rust-multibase#138).
+        #[test]
+        fn utf_char_multibyte() {
+            const ALPHABET: &str = "🚀🪐☄a🛰";
+
+            fn proc(ch: char) -> Option<usize> {
+                match_lookup::gen_char_match!(ch, "🚀🪐☄a🛰")
+            }
+
+            for (i, ch) in ALPHABET.chars().enumerate() {
+                assert_eq!(proc(ch), Some(i), "wrong index for {ch:?}");
+            }
+            assert_eq!(proc('z'), None);
+        }
+
         #[test]
         fn ascii() {
             fn proc(ch: u8) -> Option<usize> {
